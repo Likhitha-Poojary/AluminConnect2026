@@ -1,0 +1,141 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Community Directory</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header">
+    <div class="brand">
+      <i class="fas fa-graduation-cap"></i>
+      <span>AlumniConnect</span>
+    </div>
+    <nav>
+      <a href="profile.html"><i class="fas fa-user"></i> Profile</a>
+      <a href="jobs.html"><i class="fas fa-briefcase"></i> Jobs</a>
+    </nav>
+  </header>
+  
+  <main class="container">
+    <div class="card">
+      <h3><i class="fas fa-search"></i> Search members</h3>
+      <div style="position:relative">
+        <i class="fas fa-search" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-light);"></i>
+        <input id="q" placeholder="Search by name, skill or company" style="width:100%;padding:10px 10px 10px 35px;margin-top:10px;border-radius:8px;border:1px solid #eef3fb">
+      </div>
+    </div>
+
+    <div id="list" class="grid"></div>
+  </main>
+  
+  <footer class="footer">
+    <p><i class="fas fa-lightbulb"></i> Tip: Click Connect to add someone to your network or Message to start chat.</p>
+  </footer>
+  
+  <script src="../js/app.js"></script>
+  <script>
+    const list = document.getElementById('list');
+    const q = document.getElementById('q');
+    const current = App.currentUser();
+    
+    function render(filter){
+      const users = App.get('users');
+      const connections = App.getConnections();
+      const myConnections = current ? (connections[current.email] || []) : [];
+      
+      const out = users.filter(u=>{
+        if(!filter) return true;
+        if(current && u.email === current.email) return false;
+        
+        const f = filter.toLowerCase();
+        return (u.name||'').toLowerCase().includes(f) || 
+               (u.company||'').toLowerCase().includes(f) || 
+               (u.skills||[]).join(' ').toLowerCase().includes(f);
+      }).map(u=>{
+        if(current && u.email===current.email) return '';
+        
+        const isConnected = myConnections.includes(u.email);
+        
+        return `
+          <div class="card">
+            <div class="user-card">
+              <div class="avatar">${(u.name||'?').charAt(0).toUpperCase()}</div>
+              <div style="margin-left:10px">
+                <strong>${u.name}</strong>
+                <div class="meta">
+                  <i class="fas fa-${u.role==='alumni'?'user-graduate':'user'}"></i> ${u.role} • 
+                  <i class="fas fa-building"></i> ${u.company||'—'}
+                </div>
+                <div class="small" style="margin-top:6px">
+                  ${(u.skills||[]).map(s=>'<span class="skill-tag">#'+s+'</span>').join(' ')}
+                </div>
+              </div>
+            </div>
+            <div class="actions-row">
+              <button class="btn ${isConnected ? 'ghost' : 'primary'} connect" data-email="${u.email}" ${isConnected ? 'disabled' : ''}>
+                <i class="fas fa-${isConnected ? 'check' : 'user-plus'}"></i> 
+                ${isConnected ? 'Connected' : 'Connect'}
+              </button>
+              <button class="btn ghost message" data-email="${u.email}" data-name="${u.name}">
+                <i class="fas fa-comment"></i> Message
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('');
+      
+      list.innerHTML = out || '<p class="small">No members found. Try a different search term.</p>';
+      
+      // attach events
+      document.querySelectorAll('.connect').forEach(b=> b.addEventListener('click', (e)=> {
+        if(!current){ 
+          alert('Please login to connect with members'); 
+          window.location.href='login.html'; 
+          return; 
+        }
+        
+        const target = e.target.closest('.connect').dataset.email;
+        App.addConnection(current.email, target);
+        alert('Connected successfully!');
+        render(q.value); // Re-render to update connection status
+      }));
+      
+      document.querySelectorAll('.message').forEach(b=> b.addEventListener('click', (e)=>{
+        if(!current){ 
+          alert('Please login to send messages'); 
+          window.location.href='login.html'; 
+          return; 
+        }
+        
+        const t = { 
+          email: e.target.closest('.message').dataset.email, 
+          name: e.target.closest('.message').dataset.name 
+        };
+        localStorage.setItem('chatWith', JSON.stringify(t));
+        window.location.href = 'messages.html';
+      }));
+    }
+    
+    q.addEventListener('input', (e)=> render(e.target.value));
+    render();
+  </script>
+  
+  <style>
+    .skill-tag {
+      background: rgba(11, 116, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--accent);
+    }
+    
+    .connect:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  </style>
+</body>
+</html>

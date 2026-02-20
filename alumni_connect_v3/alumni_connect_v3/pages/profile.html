@@ -1,0 +1,229 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>My Profile - AlumniConnect</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="brand">
+      <i class="fas fa-graduation-cap"></i>
+      <span>AlumniConnect</span>
+    </div>
+    
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <nav id="mainNav">
+      <a href="../index.html" class="nav-home"><i class="fas fa-home"></i> Home</a>
+      <a href="directory.html" class="nav-directory"><i class="fas fa-users"></i> Community</a>
+      <a href="jobs.html" class="nav-jobs"><i class="fas fa-briefcase"></i> Jobs</a>
+      <a href="events.html" class="nav-events"><i class="fas fa-calendar-alt"></i> Events</a>
+      <a href="messages.html" class="nav-messages"><i class="fas fa-comments"></i> Messages</a>
+      <a href="dashboard.html" class="nav-dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+      <span id="authLinks">
+        <a href="login.html" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="register.html" class="btn primary"><i class="fas fa-user-plus"></i> Register</a>
+      </span>
+    </nav>
+  </header>
+  
+  <main class="container">
+    <div id="content"></div>
+  </main>
+  
+  <script src="../js/app.js"></script>
+  <script>
+    const content = document.getElementById('content');
+    const user = App.currentUser();
+    
+    if(!user){ 
+      content.innerHTML = `
+        <div class="card">
+          <div style="text-align: center; padding: 40px 20px;">
+            <i class="fas fa-user-slash" style="font-size: 48px; color: var(--muted-light); margin-bottom: 16px;"></i>
+            <h3>Not Logged In</h3>
+            <p>Please login to view your profile</p>
+            <div style="margin-top: 20px;">
+              <a href="login.html" class="btn primary"><i class="fas fa-sign-in-alt"></i> Login</a>
+              <a href="register.html" class="btn"><i class="fas fa-user-plus"></i> Register</a>
+            </div>
+          </div>
+        </div>
+      `; 
+    }
+    else{
+      const connections = App.getConnections();
+      const myConnections = connections[user.email] || [];
+      const enhancedUser = App.enhanceUserData().find(u => u.email === user.email) || user;
+      const professionName = getProfessionDisplayName(enhancedUser.profession);
+      
+      content.innerHTML = `
+        <div class="card">
+          <div style="display:flex;justify-content:space-between;align-items:center">
+            <div>
+              <div class="user-card">
+                <div class="avatar">${user.name.charAt(0).toUpperCase()}</div>
+                <div style="margin-left:10px">
+                  <h3>${user.name}</h3>
+                  <div class="meta">
+                    <i class="fas fa-${user.role==='alumni'?'user-graduate':'user'}"></i> ${user.role} • 
+                    <i class="fas fa-building"></i> ${user.company||'—'} •
+                    <span class="profession-tag">${professionName}</span>
+                  </div>
+                  <div style="margin-top:8px" class="small">
+                    ${(user.skills||[]).map(s=>'<span class="skill-tag">#'+s+'</span>').join(' ')}
+                  </div>
+                </div>
+              </div>
+            </div>
+            <div>
+              <button class="btn" id="editBtn"><i class="fas fa-edit"></i> Edit Profile</button>
+              <button class="btn" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</button>
+            </div>
+          </div>
+          <hr style="margin:20px 0;border:none;border-top:1px solid #e6eef8"/>
+          <h4><i class="fas fa-envelope"></i> Contact Information</h4>
+          <p><strong>Email:</strong> ${user.email}</p>
+          <p><strong>Role:</strong> ${user.role}</p>
+          <p><strong>Profession:</strong> ${professionName}</p>
+          ${user.company ? `<p><strong>Company:</strong> ${user.company}</p>` : ''}
+        </div>
+        
+        <div class="card">
+          <h4><i class="fas fa-handshake"></i> Your Connections (${myConnections.length})</h4>
+          <p class="small">These are members you've connected with on the platform</p>
+          <div id="connectionsList" class="grid"></div>
+        </div>
+      `;
+      
+      document.getElementById('logoutBtn').addEventListener('click',()=>{ 
+        App.logout(); 
+        window.location.href='login.html'; 
+      });
+      
+      document.getElementById('editBtn').addEventListener('click', ()=>{
+        const name = prompt('Full Name', user.name);
+        const company = prompt('Company/Institution', user.company || '');
+        const skills = prompt('Skills (comma separated)', (user.skills||[]).join(', '));
+        
+        if(name!==null){ 
+          user.name = name; 
+          user.company = company;
+          user.skills = skills.split(',').map(s=>s.trim()).filter(Boolean);
+          App.saveUser(user); 
+          localStorage.setItem('currentUser', JSON.stringify(user)); 
+          alert('Profile updated successfully!'); 
+          location.reload(); 
+        }
+      });
+      
+      // render connections
+      const cl = document.getElementById('connectionsList');
+      const users = App.get('users');
+      const conns = myConnections;
+      
+      cl.innerHTML = conns.map(email => {
+        const u = users.find(x=>x.email===email);
+        if(!u) return '';
+        const enhancedConn = App.enhanceUserData().find(usr => usr.email === u.email) || u;
+        const professionName = getProfessionDisplayName(enhancedConn.profession);
+        
+        return `
+          <div class="card member-card">
+            <div class="user-card">
+              <div class="avatar">${u.name.charAt(0).toUpperCase()}</div>
+              <div style="margin-left:8px; flex: 1;">
+                <div style="display: flex; align-items: center; margin-bottom: 4px;">
+                  <strong>${u.name}</strong>
+                  <span class="role-tag">${u.role}</span>
+                  <span class="profession-tag">${professionName}</span>
+                </div>
+                <div class="meta">
+                  <i class="fas fa-building"></i> ${u.company||'—'} • 
+                  <i class="fas fa-envelope"></i> ${u.email}
+                </div>
+              </div>
+            </div>
+            <div style="margin-top:8px">
+              <a class="btn" href="messages.html" onclick="localStorage.setItem('chatWith', JSON.stringify(${JSON.stringify(u)}))">
+                <i class="fas fa-comment"></i> Message
+              </a>
+            </div>
+          </div>
+        `;
+      }).join('') || `
+        <div class="no-results">
+          <i class="fas fa-users" style="font-size: 48px; color: var(--muted-light); margin-bottom: 16px;"></i>
+          <h4>No connections yet</h4>
+          <p class="small">Browse the <a href="directory.html">community directory</a> to connect with other members</p>
+        </div>
+      `;
+    }
+    
+    function getProfessionDisplayName(profession) {
+      const professionMap = {
+        'technology': 'Technology',
+        'business': 'Business',
+        'healthcare': 'Healthcare',
+        'education': 'Education',
+        'engineering': 'Engineering',
+        'finance': 'Finance',
+        'creative': 'Creative Arts',
+        'research': 'Research',
+        'other': 'Other'
+      };
+      return professionMap[profession] || 'Other';
+    }
+
+    // Mobile menu functionality
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+      document.getElementById('mainNav').classList.toggle('show');
+    });
+
+    // Update auth links based on login status
+    function updateAuthLinks() {
+      const current = App.currentUser();
+      const authLinks = document.getElementById('authLinks');
+      
+      if (authLinks && current) {
+        authLinks.innerHTML = `
+          <a href="profile.html" class="btn active"><i class="fas fa-user"></i> Profile</a>
+          <a href="#" class="btn primary" id="logoutBtnNav"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        `;
+        document.getElementById('logoutBtnNav')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          App.logout();
+          window.location.href = 'login.html';
+        });
+      }
+    }
+
+    updateAuthLinks();
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+      const nav = document.getElementById('mainNav');
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      
+      if (nav && menuBtn && !nav.contains(e.target) && !menuBtn.contains(e.target)) {
+        nav.classList.remove('show');
+      }
+    });
+  </script>
+  
+  <style>
+    .skill-tag {
+      background: rgba(11, 116, 255, 0.1);
+      padding: 2px 8px;
+      border-radius: 12px;
+      font-size: 12px;
+      color: var(--accent);
+    }
+  </style>
+</body>
+</html>

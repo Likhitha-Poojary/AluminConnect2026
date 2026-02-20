@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Platform Dashboard - AlumniConnect</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="brand">
+      <i class="fas fa-graduation-cap"></i>
+      <span>AlumniConnect</span>
+    </div>
+    
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <nav id="mainNav">
+      <a href="../index.html" class="nav-home"><i class="fas fa-home"></i> Home</a>
+      <a href="directory.html" class="nav-directory"><i class="fas fa-users"></i> Community</a>
+      <a href="jobs.html" class="nav-jobs"><i class="fas fa-briefcase"></i> Jobs</a>
+      <a href="events.html" class="nav-events"><i class="fas fa-calendar-alt"></i> Events</a>
+      <a href="messages.html" class="nav-messages"><i class="fas fa-comments"></i> Messages</a>
+      <a href="dashboard.html" class="nav-dashboard active"><i class="fas fa-chart-bar"></i> Dashboard</a>
+      <span id="authLinks">
+        <a href="login.html" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="register.html" class="btn primary"><i class="fas fa-user-plus"></i> Register</a>
+      </span>
+    </nav>
+  </header>
+  
+  <main class="container">
+    <div class="card">
+      <h3><i class="fas fa-chart-bar"></i> Platform Analytics Dashboard</h3>
+      <p class="small">Real-time insights into community engagement and platform usage</p>
+      <div id="stats" class="grid" style="margin-top:20px"></div>
+    </div>
+    
+    <div class="grid">
+      <div class="card">
+        <h4><i class="fas fa-info-circle"></i> About This Dashboard</h4>
+        <p>This dashboard displays live statistics from the AlumniConnect platform. All data is stored locally in your browser and updates in real-time as users interact with the platform.</p>
+        <p class="small">The statistics demonstrate the platform's data tracking capabilities and provide insights into community engagement patterns.</p>
+      </div>
+      <div class="card">
+        <h4><i class="fas fa-database"></i> Data Management</h4>
+        <p>AlumniConnect uses browser localStorage for data persistence, showcasing how modern web applications can function without backend infrastructure while maintaining performance.</p>
+        <div class="tech-tags" style="margin-top:10px">
+          <span class="tech-tag">LocalStorage API</span>
+          <span class="tech-tag">Client-side Processing</span>
+          <span class="tech-tag">Real-time Updates</span>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="footer">
+    <p>AlumniConnect Platform Dashboard &copy; 2025</p>
+  </footer>
+  
+  <script src="../js/app.js"></script>
+  <script>
+    function renderStats(){
+      const users = App.get('users'), 
+            jobs = App.get('jobs'), 
+            events = App.get('events'), 
+            msgs = App.get('messages');
+      
+      const connections = App.getConnections();
+      const connCount = Object.keys(connections).reduce((s,k)=> s + (connections[k]||[]).length, 0) / 2;
+      
+      const stats = [
+        {title:'Community Members', value: users.length, icon:'users', color:'#0b74ff', desc:'Registered platform users'},
+        {title:'Career Opportunities', value: jobs.length, icon:'briefcase', color:'#10b981', desc:'Active job postings'},
+        {title:'Network Events', value: events.length, icon:'calendar-check', color:'#f59e0b', desc:'Upcoming and past events'},
+        {title:'Messages Exchanged', value: msgs.length, icon:'comments', color:'#8b5cf6', desc:'Total messages sent'},
+        {title:'Professional Connections', value: Math.round(connCount), icon:'handshake', color:'#ef4444', desc:'Mutual connections made'},
+        {title:'Platform Engagement', value: users.length + jobs.length + events.length + msgs.length, icon:'chart-line', color:'#06b6d4', desc:'Total platform interactions'}
+      ];
+      
+      document.getElementById('stats').innerHTML = stats.map(s=>`
+        <div class="stat-card card">
+          <i class="fas fa-${s.icon}" style="color:${s.color}"></i>
+          <div class="number">${s.value}</div>
+          <div class="label">${s.title}</div>
+          <div class="stat-desc">${s.desc}</div>
+        </div>
+      `).join('');
+    }
+    
+    renderStats();
+    
+    // Update stats every 5 seconds to show real-time capability
+    setInterval(renderStats, 5000);
+
+    // Mobile menu functionality
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+      document.getElementById('mainNav').classList.toggle('show');
+    });
+
+    // Update auth links based on login status
+    function updateAuthLinks() {
+      const current = App.currentUser();
+      const authLinks = document.getElementById('authLinks');
+      
+      if (authLinks) {
+        if (current) {
+          authLinks.innerHTML = `
+            <a href="profile.html" class="btn"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" class="btn primary" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          `;
+          document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            App.logout();
+            window.location.href = 'login.html';
+          });
+        }
+      }
+    }
+
+    updateAuthLinks();
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+      const nav = document.getElementById('mainNav');
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      
+      if (nav && menuBtn && !nav.contains(e.target) && !menuBtn.contains(e.target)) {
+        nav.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>

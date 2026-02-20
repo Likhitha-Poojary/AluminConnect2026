@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Register - AlumniConnect</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="brand">
+      <i class="fas fa-graduation-cap"></i>
+      <span>AlumniConnect</span>
+    </div>
+    
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <nav id="mainNav">
+      <a href="../index.html" class="nav-home"><i class="fas fa-home"></i> Home</a>
+      <a href="directory.html" class="nav-directory"><i class="fas fa-users"></i> Community</a>
+      <a href="jobs.html" class="nav-jobs"><i class="fas fa-briefcase"></i> Jobs</a>
+      <a href="events.html" class="nav-events"><i class="fas fa-calendar-alt"></i> Events</a>
+      <a href="messages.html" class="nav-messages"><i class="fas fa-comments"></i> Messages</a>
+      <a href="dashboard.html" class="nav-dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+      <span id="authLinks">
+        <a href="login.html" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="register.html" class="btn primary active"><i class="fas fa-user-plus"></i> Register</a>
+      </span>
+    </nav>
+  </header>
+  
+  <main class="container">
+    <div class="card" style="max-width:720px;margin:auto">
+      <h3><i class="fas fa-user-plus"></i> Join AlumniConnect</h3>
+      <p class="small" style="margin-bottom:20px;">Create your account to connect with alumni worldwide</p>
+      <form id="regForm">
+        <div class="grid">
+          <div style="position:relative">
+            <i class="fas fa-user" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-light);"></i>
+            <input id="name" placeholder="Full name" required style="padding-left:35px">
+          </div>
+          <div style="position:relative">
+            <i class="fas fa-envelope" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-light);"></i>
+            <input id="email" type="email" placeholder="Email" required style="padding-left:35px">
+          </div>
+        </div>
+        
+        <div class="grid" style="margin-top:8px">
+          <div style="position:relative">
+            <i class="fas fa-lock" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-light);"></i>
+            <input id="password" type="password" placeholder="Password" required style="padding-left:35px">
+          </div>
+          <select id="role">
+            <option value="student">Student</option>
+            <option value="alumni">Alumni</option>
+            <option value="faculty">Faculty</option>
+            <option value="professional">Professional</option>
+          </select>
+        </div>
+        
+        <div class="grid" style="margin-top:8px">
+          <div style="position:relative">
+            <i class="fas fa-building" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-light);"></i>
+            <input id="company" placeholder="Company or Institution" style="padding-left:35px">
+          </div>
+          <div style="position:relative">
+            <i class="fas fa-tools" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-light);"></i>
+            <input id="skills" placeholder="Skills (comma separated)" style="padding-left:35px">
+          </div>
+        </div>
+        
+        <div style="margin-top:12px">
+          <button class="btn primary" type="submit" style="width:100%"><i class="fas fa-user-plus"></i> Register & Login</button>
+          <div style="text-align:center;margin-top:12px;">
+            <a href="login.html" class="btn"><i class="fas fa-sign-in-alt"></i> Already have an account?</a>
+          </div>
+        </div>
+      </form>
+    </div>
+  </main>
+  
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById('regForm').addEventListener('submit', function(e){
+      e.preventDefault();
+      const user = {
+        name: document.getElementById('name').value.trim(),
+        email: document.getElementById('email').value.trim().toLowerCase(),
+        password: document.getElementById('password').value,
+        role: document.getElementById('role').value,
+        company: document.getElementById('company').value.trim(),
+        skills: document.getElementById('skills').value.split(',').map(s=>s.trim()).filter(Boolean)
+      };
+      
+      if(!user.name||!user.email||!user.password){ 
+        alert('Please fill all required fields'); 
+        return; 
+      }
+      
+      // Check if user already exists
+      if(App.findUserByEmail(user.email)) {
+        alert('User with this email already exists. Please login instead.');
+        return;
+      }
+      
+      App.saveUser(user);
+      localStorage.setItem('currentUser', JSON.stringify(user));
+      alert('Account created successfully! Welcome to AlumniConnect.');
+      window.location.href = 'profile.html';
+    });
+
+    // Mobile menu functionality
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+      document.getElementById('mainNav').classList.toggle('show');
+    });
+
+    // Update auth links based on login status
+    function updateAuthLinks() {
+      const current = App.currentUser();
+      const authLinks = document.getElementById('authLinks');
+      
+      if (authLinks && current) {
+        authLinks.innerHTML = `
+          <a href="profile.html" class="btn"><i class="fas fa-user"></i> Profile</a>
+          <a href="#" class="btn primary" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        `;
+        document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          App.logout();
+          window.location.href = 'login.html';
+        });
+      }
+    }
+
+    updateAuthLinks();
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+      const nav = document.getElementById('mainNav');
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      
+      if (nav && menuBtn && !nav.contains(e.target) && !menuBtn.contains(e.target)) {
+        nav.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>

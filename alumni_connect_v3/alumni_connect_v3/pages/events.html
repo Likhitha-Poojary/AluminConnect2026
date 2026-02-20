@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Events - AlumniConnect</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="brand">
+      <i class="fas fa-graduation-cap"></i>
+      <span>AlumniConnect</span>
+    </div>
+    
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <nav id="mainNav">
+      <a href="../index.html" class="nav-home"><i class="fas fa-home"></i> Home</a>
+      <a href="directory.html" class="nav-directory"><i class="fas fa-users"></i> Community</a>
+      <a href="jobs.html" class="nav-jobs"><i class="fas fa-briefcase"></i> Jobs</a>
+      <a href="events.html" class="nav-events active"><i class="fas fa-calendar-alt"></i> Events</a>
+      <a href="messages.html" class="nav-messages"><i class="fas fa-comments"></i> Messages</a>
+      <a href="dashboard.html" class="nav-dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+      <span id="authLinks">
+        <a href="login.html" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="register.html" class="btn primary"><i class="fas fa-user-plus"></i> Register</a>
+      </span>
+    </nav>
+  </header>
+  
+  <main class="container">
+    <div class="card">
+      <h3><i class="fas fa-calendar-alt"></i> Alumni Events</h3>
+      <p class="small">Discover networking events, reunions, and professional development opportunities</p>
+    </div>
+
+    <div style="display:flex;gap:12px;flex-wrap:wrap">
+      <div style="flex:1;min-width:300px" class="card">
+        <h3><i class="fas fa-plus-circle"></i> Create New Event</h3>
+        <form id="eventForm">
+          <input id="title" placeholder="Event title" required>
+          <input id="date" type="date" required>
+          <input id="place" placeholder="Location or Virtual Platform">
+          <textarea id="desc" placeholder="Event description, agenda, and details" rows="4"></textarea>
+          <div style="margin-top:8px">
+            <button class="btn primary" type="submit" style="width:100%"><i class="fas fa-calendar-plus"></i> Create Event</button>
+          </div>
+        </form>
+      </div>
+      
+      <div style="flex:2;min-width:320px">
+        <div class="card">
+          <h3><i class="fas fa-calendar-check"></i> Upcoming Events</h3>
+          <p class="small">Join these events to connect with fellow alumni</p>
+        </div>
+        <div id="eventsList"></div>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="footer">
+    <p>AlumniConnect Events &copy; 2025</p>
+  </footer>
+  
+  <script src="../js/app.js"></script>
+  <script>
+    const eventsList = document.getElementById('eventsList');
+    
+    function renderEvents(){
+      const events = App.get('events');
+      
+      // Sort events by date (newest first)
+      const sortedEvents = events.sort((a, b) => new Date(b.created) - new Date(a.created));
+      
+      eventsList.innerHTML = sortedEvents.map(ev => {
+        const eventDate = new Date(ev.date);
+        const isUpcoming = eventDate >= new Date();
+        
+        return `
+          <div class="card event-card ${isUpcoming ? 'upcoming' : 'past'}">
+            <div style="display:flex;justify-content:space-between;align-items:flex-start">
+              <div style="flex:1">
+                <h4>${ev.title}</h4>
+                <div class="meta">
+                  <i class="fas fa-calendar-day"></i> ${new Date(ev.date).toLocaleDateString()} • 
+                  <i class="fas fa-map-marker-alt"></i> ${ev.place||'Virtual Event'}
+                </div>
+                <p class="small">${ev.desc}</p>
+              </div>
+              <span class="event-badge ${isUpcoming ? 'upcoming' : 'past'}">
+                ${isUpcoming ? 'Upcoming' : 'Past'}
+              </span>
+            </div>
+            <small class="small">
+              <i class="fas fa-clock"></i> Created ${new Date(ev.created).toLocaleDateString()}
+            </small>
+            <div style="margin-top:10px">
+              <button class="btn ${isUpcoming ? 'primary' : 'ghost'} rsvp-btn" data-event="${ev.title}">
+                <i class="fas fa-calendar-check"></i> ${isUpcoming ? 'RSVP Now' : 'View Details'}
+              </button>
+            </div>
+          </div>
+        `;
+      }).join('') || `
+        <div class="card">
+          <div style="text-align:center;padding:40px 20px;">
+            <i class="fas fa-calendar-plus" style="font-size:48px;color:var(--muted-light);margin-bottom:16px;"></i>
+            <h4>No Events Scheduled</h4>
+            <p class="small">Be the first to create an event for the community!</p>
+          </div>
+        </div>
+      `;
+      
+      // Add RSVP button events
+      document.querySelectorAll('.rsvp-btn').forEach(btn => {
+        btn.addEventListener('click', function() {
+          const eventTitle = this.dataset.event;
+          const current = App.currentUser();
+          if (!current) {
+            alert('Please login to RSVP for events');
+            window.location.href = 'login.html';
+            return;
+          }
+          alert(`You've ${this.textContent.trim().toLowerCase()} for "${eventTitle}"!\n\nIn a real application, this would:\n- Add you to the attendee list\n- Send calendar invitations\n- Enable event reminders and updates`);
+        });
+      });
+    }
+    
+    document.getElementById('eventForm').addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const current = App.currentUser();
+      
+      if (!current) {
+        alert('Please login to create events');
+        window.location.href = 'login.html';
+        return;
+      }
+      
+      const ev = { 
+        title: document.getElementById('title').value, 
+        date: document.getElementById('date').value, 
+        place: document.getElementById('place').value, 
+        desc: document.getElementById('desc').value, 
+        created: new Date().toISOString() 
+      };
+      
+      App.addEvent(ev);
+      renderEvents();
+      e.target.reset();
+      alert('Event created successfully! It is now visible to the community.');
+    });
+    
+    // Set minimum date to today
+    document.getElementById('date').min = new Date().toISOString().split('T')[0];
+    
+    renderEvents();
+
+    // Mobile menu functionality
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+      document.getElementById('mainNav').classList.toggle('show');
+    });
+
+    // Update auth links based on login status
+    function updateAuthLinks() {
+      const current = App.currentUser();
+      const authLinks = document.getElementById('authLinks');
+      
+      if (authLinks) {
+        if (current) {
+          authLinks.innerHTML = `
+            <a href="profile.html" class="btn"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" class="btn primary" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          `;
+          document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            App.logout();
+            window.location.href = 'login.html';
+          });
+        }
+      }
+    }
+
+    updateAuthLinks();
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+      const nav = document.getElementById('mainNav');
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      
+      if (nav && menuBtn && !nav.contains(e.target) && !menuBtn.contains(e.target)) {
+        nav.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>

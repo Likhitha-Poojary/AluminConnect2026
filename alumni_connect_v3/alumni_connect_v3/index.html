@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AlumniConnect - Professional Alumni Networking Platform</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="brand">
+      <i class="fas fa-graduation-cap"></i>
+      <span>AlumniConnect</span>
+    </div>
+    
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <nav id="mainNav">
+      <a href="index.html" class="nav-home active"><i class="fas fa-home"></i> Home</a>
+      <a href="pages/directory.html" class="nav-directory"><i class="fas fa-users"></i> Community</a>
+      <a href="pages/jobs.html" class="nav-jobs"><i class="fas fa-briefcase"></i> Jobs</a>
+      <a href="pages/events.html" class="nav-events"><i class="fas fa-calendar-alt"></i> Events</a>
+      <a href="pages/messages.html" class="nav-messages"><i class="fas fa-comments"></i> Messages</a>
+      <a href="pages/dashboard.html" class="nav-dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+      <span id="authLinks">
+        <a href="pages/login.html" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="pages/register.html" class="btn primary"><i class="fas fa-user-plus"></i> Register</a>
+      </span>
+    </nav>
+  </header>
+
+  <main class="container">
+    <section class="hero card">
+      <div>
+        <h1>Empowering Alumni Connections Worldwide</h1>
+        <p>AlumniConnect is a comprehensive networking platform designed to bridge the gap between alumni, students, and institutions. Foster meaningful connections, discover career opportunities, and stay engaged with your alma mater community.</p>
+        <div class="actions">
+          <a href="pages/register.html" class="btn primary"><i class="fas fa-rocket"></i> Get Started</a>
+          <a href="#features" class="btn ghost"><i class="fas fa-play-circle"></i> Watch Demo</a>
+        </div>
+      </div>
+      <div class="icon-container">
+        <i class="fas fa-network-wired"></i>
+      </div>
+    </section>
+
+    <section class="stats">
+      <div class="stats-grid">
+        <div class="stat-card card">
+          <i class="fas fa-users"></i>
+          <div class="number" id="membersCount">0</div>
+          <div class="label">Registered Members</div>
+        </div>
+        <div class="stat-card card">
+          <i class="fas fa-briefcase"></i>
+          <div class="number" id="jobsCount">0</div>
+          <div class="label">Career Opportunities</div>
+        </div>
+        <div class="stat-card card">
+          <i class="fas fa-calendar-check"></i>
+          <div class="number" id="eventsCount">0</div>
+          <div class="label">Network Events</div>
+        </div>
+        <div class="stat-card card">
+          <i class="fas fa-handshake"></i>
+          <div class="number" id="connectionsCount">0</div>
+          <div class="label">Successful Connections</div>
+        </div>
+      </div>
+    </section>
+
+    <section id="features" class="features">
+      <h2>Platform Features</h2>
+      <div class="feature-grid">
+        <div class="feature-card card">
+          <i class="fas fa-user-friends"></i>
+          <h3>Alumni Directory</h3>
+          <p>Comprehensive searchable directory of alumni with advanced filtering by industry, location, skills, and graduation year.</p>
+        </div>
+        <div class="feature-card card">
+          <i class="fas fa-briefcase"></i>
+          <h3>Career Center</h3>
+          <p>Exclusive job board featuring opportunities from alumni employers and career mentorship programs.</p>
+        </div>
+        <div class="feature-card card">
+          <i class="fas fa-calendar-alt"></i>
+          <h3>Event Management</h3>
+          <p>Create, promote, and manage alumni events, reunions, webinars, and networking sessions.</p>
+        </div>
+        <div class="feature-card card">
+          <i class="fas fa-comments"></i>
+          <h3>Direct Messaging</h3>
+          <p>Secure communication platform for alumni to connect, collaborate, and build professional relationships.</p>
+        </div>
+        <div class="feature-card card">
+          <i class="fas fa-chart-line"></i>
+          <h3>Analytics Dashboard</h3>
+          <p>Comprehensive insights into community engagement, connection patterns, and platform usage metrics.</p>
+        </div>
+        <div class="feature-card card">
+          <i class="fas fa-mobile-alt"></i>
+          <h3>Responsive Design</h3>
+          <p>Fully responsive interface that works seamlessly across all devices - desktop, tablet, and mobile.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="about">
+      <div class="card">
+        <div class="about-content">
+          <div>
+            <h2>About AlumniConnect</h2>
+            <p>AlumniConnect is a modern web application designed to facilitate meaningful connections between alumni and their educational institutions. Our platform serves as a digital hub where graduates can reconnect, share experiences, and support each other's professional growth.</p>
+            <p>Built with cutting-edge web technologies, AlumniConnect demonstrates the potential of client-side applications with local data storage, providing instant performance and complete data privacy.</p>
+            <div class="tech-stack">
+              <h4>Technology Stack:</h4>
+              <div class="tech-tags">
+                <span class="tech-tag">HTML5</span>
+                <span class="tech-tag">CSS3</span>
+                <span class="tech-tag">JavaScript</span>
+                <span class="tech-tag">LocalStorage API</span>
+                <span class="tech-tag">Font Awesome</span>
+                <span class="tech-tag">Responsive Design</span>
+              </div>
+            </div>
+          </div>
+          <div class="about-image">
+            <i class="fas fa-university"></i>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="use-cases">
+      <h2>Use Cases</h2>
+      <div class="grid">
+        <div class="card">
+          <h3><i class="fas fa-graduation-cap"></i> For Educational Institutions</h3>
+          <p>Provide your alumni with a dedicated platform to stay connected with the institution and fellow graduates. Track engagement metrics and foster lifelong relationships.</p>
+        </div>
+        <div class="card">
+          <h3><i class="fas fa-user-tie"></i> For Alumni Professionals</h3>
+          <p>Expand your professional network, discover career opportunities, and give back by mentoring current students and recent graduates.</p>
+        </div>
+        <div class="card">
+          <h3><i class="fas fa-laptop-code"></i> For Students</h3>
+          <p>Connect with alumni for career guidance, internship opportunities, and industry insights to kickstart your professional journey.</p>
+        </div>
+      </div>
+    </section>
+
+    <section class="demo">
+      <div class="card demo-card">
+        <div class="demo-content">
+          <div>
+            <h2>Experience AlumniConnect</h2>
+            <p>This is a fully functional demo showcasing all core features of the AlumniConnect platform. All data is stored locally in your browser, demonstrating the application's capabilities without requiring backend infrastructure.</p>
+            <div class="demo-actions">
+              <a href="pages/register.html" class="btn primary"><i class="fas fa-user-plus"></i> Create Account</a>
+              <p class="demo-note">or use demo credentials: admin@alumni.com / admin123</p>
+            </div>
+          </div>
+          <div class="demo-features">
+            <div class="demo-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Complete User Registration & Profiles</span>
+            </div>
+            <div class="demo-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Interactive Community Directory</span>
+            </div>
+            <div class="demo-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Job Board with Posting Capabilities</span>
+            </div>
+            <div class="demo-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Event Creation & Management</span>
+            </div>
+            <div class="demo-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Real-time Messaging System</span>
+            </div>
+            <div class="demo-feature">
+              <i class="fas fa-check-circle"></i>
+              <span>Analytics Dashboard</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="footer-content">
+      <div class="footer-section">
+        <h4><i class="fas fa-graduation-cap"></i> AlumniConnect</h4>
+        <p>Professional Alumni Networking Platform</p>
+        <p class="footer-info">A demonstration of modern web application capabilities with client-side data management.</p>
+      </div>
+      <div class="footer-section">
+        <h4>Quick Links</h4>
+        <a href="pages/directory.html">Community Directory</a>
+        <a href="pages/jobs.html">Career Center</a>
+        <a href="pages/events.html">Events</a>
+        <a href="pages/dashboard.html">Dashboard</a>
+      </div>
+      <div class="footer-section">
+        <h4>Technology</h4>
+        <p>Built with HTML5, CSS3, JavaScript</p>
+        <p>LocalStorage Data Management</p>
+        <p>Responsive Web Design</p>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <p>&copy; 2025 AlumniConnect Platform. This is a demonstration project showcasing web development capabilities.</p>
+    </div>
+  </footer>
+
+  <script src="js/app.js"></script>
+  <script>
+    // Update stats with real data
+    function updateStats() {
+      const users = App.get('users') || [];
+      const jobs = App.get('jobs') || [];
+      const events = App.get('events') || [];
+      const connections = App.getConnections();
+      
+      let totalConnections = 0;
+      Object.keys(connections).forEach(email => {
+        totalConnections += connections[email].length;
+      });
+      totalConnections = Math.round(totalConnections / 2);
+      
+      document.getElementById('membersCount').textContent = users.length;
+      document.getElementById('jobsCount').textContent = jobs.length;
+      document.getElementById('eventsCount').textContent = events.length;
+      document.getElementById('connectionsCount').textContent = totalConnections;
+    }
+
+    // Header scroll effect
+    window.addEventListener('scroll', function() {
+      const header = document.getElementById('header');
+      if (window.scrollY > 50) {
+        header.classList.add('scrolled');
+      } else {
+        header.classList.remove('scrolled');
+      }
+    });
+
+    // Initialize stats
+    updateStats();
+
+    // Mobile menu functionality
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+      document.getElementById('mainNav').classList.toggle('show');
+    });
+
+    // Update auth links based on login status
+    function updateAuthLinks() {
+      const current = App.currentUser();
+      const authLinks = document.getElementById('authLinks');
+      
+      if (authLinks) {
+        if (current) {
+          authLinks.innerHTML = `
+            <a href="pages/profile.html" class="btn"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" class="btn primary" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          `;
+          document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            App.logout();
+            window.location.reload();
+          });
+        }
+      }
+    }
+
+    updateAuthLinks();
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+      const nav = document.getElementById('mainNav');
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      
+      if (nav && menuBtn && !nav.contains(e.target) && !menuBtn.contains(e.target)) {
+        nav.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>

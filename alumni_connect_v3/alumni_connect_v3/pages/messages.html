@@ -1,0 +1,298 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Messages - AlumniConnect</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="brand">
+      <i class="fas fa-graduation-cap"></i>
+      <span>AlumniConnect</span>
+    </div>
+    
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <nav id="mainNav">
+      <a href="../index.html" class="nav-home"><i class="fas fa-home"></i> Home</a>
+      <a href="directory.html" class="nav-directory"><i class="fas fa-users"></i> Community</a>
+      <a href="jobs.html" class="nav-jobs"><i class="fas fa-briefcase"></i> Jobs</a>
+      <a href="events.html" class="nav-events"><i class="fas fa-calendar-alt"></i> Events</a>
+      <a href="messages.html" class="nav-messages active"><i class="fas fa-comments"></i> Messages</a>
+      <a href="dashboard.html" class="nav-dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+      <span id="authLinks">
+        <a href="login.html" class="btn"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="register.html" class="btn primary"><i class="fas fa-user-plus"></i> Register</a>
+      </span>
+    </nav>
+  </header>
+  
+  <main class="container">
+    <div class="message-box">
+      <div class="member-list card">
+        <h4><i class="fas fa-users"></i> Community Members</h4>
+        <p class="small" style="margin-bottom:15px;">Connect and start conversations</p>
+        <div id="membersList"></div>
+      </div>
+      <div class="chat-panel">
+        <div id="chatHeader" class="chat-header">
+          <strong><i class="fas fa-comments"></i> Select a member to start chatting</strong>
+        </div>
+        <div id="chatArea" class="chat-area"></div>
+        <div class="input-row">
+          <input id="msgInput" placeholder="Type your message here...">
+          <button class="btn primary" id="sendBtn"><i class="fas fa-paper-plane"></i> Send</button>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <footer class="footer">
+    <p>AlumniConnect Messaging &copy; 2025</p>
+  </footer>
+  
+  <script src="../js/app.js"></script>
+  <script>
+    const membersList = document.getElementById('membersList'), 
+          chatArea = document.getElementById('chatArea'), 
+          chatHeader = document.getElementById('chatHeader');
+    
+    let target = null;
+    const current = App.currentUser();
+    
+    function renderMembers(){
+      if (!current) {
+        membersList.innerHTML = `
+          <div style="text-align:center;padding:20px;">
+            <i class="fas fa-user-slash" style="font-size:32px;color:var(--muted-light);margin-bottom:10px;"></i>
+            <p class="small">Please <a href="login.html">login</a> to view and message members</p>
+          </div>
+        `;
+        return;
+      }
+      
+      const users = App.get('users');
+      const connections = App.getConnections();
+      const myConnections = connections[current.email] || [];
+      
+      // Show connected members first, then others
+      const connectedUsers = users.filter(u => myConnections.includes(u.email) && u.email !== current.email);
+      const otherUsers = users.filter(u => !myConnections.includes(u.email) && u.email !== current.email);
+      
+      let html = '';
+      
+      if (connectedUsers.length > 0) {
+        html += '<div class="small" style="margin:10px 0 5px;color:var(--muted)"><i class="fas fa-handshake"></i> Your Connections</div>';
+        html += connectedUsers.map(u => {
+          const enhancedUser = App.enhanceUserData().find(usr => usr.email === u.email) || u;
+          const professionName = getProfessionDisplayName(enhancedUser.profession);
+          return `
+            <div class="member-item connected" data-email="${u.email}" data-name="${u.name}">
+              <div class="avatar">${u.name.charAt(0).toUpperCase()}</div>
+              <div style="margin-left:8px;flex:1">
+                <strong>${u.name}</strong>
+                <div class="small">
+                  <span class="role-tag">${u.role}</span>
+                  <span class="profession-tag">${professionName}</span>
+                </div>
+                <div class="small"><i class="fas fa-building"></i> ${u.company||'—'}</div>
+              </div>
+              <i class="fas fa-comment-dots" style="color:var(--accent)"></i>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      if (otherUsers.length > 0) {
+        html += '<div class="small" style="margin:15px 0 5px;color:var(--muted)"><i class="fas fa-users"></i> Other Members</div>';
+        html += otherUsers.map(u => {
+          const enhancedUser = App.enhanceUserData().find(usr => usr.email === u.email) || u;
+          const professionName = getProfessionDisplayName(enhancedUser.profession);
+          return `
+            <div class="member-item" data-email="${u.email}" data-name="${u.name}">
+              <div class="avatar">${u.name.charAt(0).toUpperCase()}</div>
+              <div style="margin-left:8px;flex:1">
+                <strong>${u.name}</strong>
+                <div class="small">
+                  <span class="role-tag">${u.role}</span>
+                  <span class="profession-tag">${professionName}</span>
+                </div>
+                <div class="small"><i class="fas fa-building"></i> ${u.company||'—'}</div>
+              </div>
+            </div>
+          `;
+        }).join('');
+      }
+      
+      membersList.innerHTML = html || `
+        <div style="text-align:center;padding:20px;">
+          <i class="fas fa-users" style="font-size:32px;color:var(--muted-light);margin-bottom:10px;"></i>
+          <p class="small">No members available to message</p>
+        </div>
+      `;
+      
+      document.querySelectorAll('.member-item').forEach(el=> {
+        el.addEventListener('click',(e)=>{
+          const email = el.dataset.email;
+          const name = el.dataset.name;
+          
+          if(current && email===current.email) { 
+            alert('This is your profile'); 
+            return; 
+          }
+          
+          if (!current) {
+            alert('Please login to start chatting');
+            window.location.href = 'login.html';
+            return;
+          }
+          
+          target = { email, name };
+          localStorage.setItem('chatWith', JSON.stringify(target));
+          chatHeader.innerHTML = `<strong><i class="fas fa-comments"></i> Chat with ${name}</strong>`;
+          loadMessages();
+        });
+      });
+    }
+    
+    function loadMessages(){
+      chatArea.innerHTML = '';
+      if(!target || !current) return;
+      
+      const msgs = App.get('messages');
+      const filtered = msgs.filter(m=> 
+        (m.from===current.email && m.to===target.email) || 
+        (m.from===target.email && m.to===current.email)
+      );
+      
+      if (filtered.length === 0) {
+        chatArea.innerHTML = `
+          <div class="no-messages">
+            <i class="fas fa-comment-slash"></i>
+            <p>No messages yet. Start the conversation!</p>
+            <p class="small">Send a message to connect with ${target.name}</p>
+          </div>
+        `;
+        return;
+      }
+      
+      filtered.forEach(m=>{
+        const d = document.createElement('div');
+        d.className = 'msg ' + (m.from===current.email ? 'sent' : 'recv');
+        
+        const time = new Date(m.when).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+        d.innerHTML = `
+          <div class="msg-text">${m.text}</div>
+          <div class="msg-time">${time}</div>
+        `;
+        
+        chatArea.appendChild(d);
+      });
+      
+      chatArea.scrollTop = chatArea.scrollHeight;
+    }
+    
+    document.getElementById('sendBtn').addEventListener('click', ()=>{
+      const text = document.getElementById('msgInput').value.trim();
+      if(!text) return;
+      
+      if(!current){ 
+        alert('Please login to send messages'); 
+        window.location.href='login.html'; 
+        return; 
+      }
+      
+      if(!target){ 
+        alert('Select a member to chat with'); 
+        return; 
+      }
+      
+      const msg = { 
+        from: current.email, 
+        to: target.email, 
+        text, 
+        when: new Date().toISOString() 
+      };
+      
+      App.addMessage(msg);
+      document.getElementById('msgInput').value='';
+      loadMessages();
+    });
+    
+    // Enter key to send message
+    document.getElementById('msgInput').addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        document.getElementById('sendBtn').click();
+      }
+    });
+    
+    function getProfessionDisplayName(profession) {
+      const professionMap = {
+        'technology': 'Technology',
+        'business': 'Business',
+        'healthcare': 'Healthcare',
+        'education': 'Education',
+        'engineering': 'Engineering',
+        'finance': 'Finance',
+        'creative': 'Creative Arts',
+        'research': 'Research',
+        'other': 'Other'
+      };
+      return professionMap[profession] || 'Other';
+    }
+    
+    // restore chatWith on load
+    (function(){
+      const stored = localStorage.getItem('chatWith');
+      if(stored){ 
+        target = JSON.parse(stored); 
+        chatHeader.innerHTML = `<strong><i class="fas fa-comments"></i> Chat with ${target.name}</strong>`; 
+      }
+      renderMembers(); 
+      loadMessages();
+    })();
+
+    // Mobile menu functionality
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+      document.getElementById('mainNav').classList.toggle('show');
+    });
+
+    // Update auth links based on login status
+    function updateAuthLinks() {
+      const current = App.currentUser();
+      const authLinks = document.getElementById('authLinks');
+      
+      if (authLinks) {
+        if (current) {
+          authLinks.innerHTML = `
+            <a href="profile.html" class="btn"><i class="fas fa-user"></i> Profile</a>
+            <a href="#" class="btn primary" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+          `;
+          document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+            e.preventDefault();
+            App.logout();
+            window.location.href = 'login.html';
+          });
+        }
+      }
+    }
+
+    updateAuthLinks();
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+      const nav = document.getElementById('mainNav');
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      
+      if (nav && menuBtn && !nav.contains(e.target) && !menuBtn.contains(e.target)) {
+        nav.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>

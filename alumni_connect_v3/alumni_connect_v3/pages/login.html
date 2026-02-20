@@ -1,0 +1,121 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <title>Login - AlumniConnect</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="../css/style.css">
+</head>
+<body>
+  <header class="header" id="header">
+    <div class="brand">
+      <i class="fas fa-graduation-cap"></i>
+      <span>AlumniConnect</span>
+    </div>
+    
+    <button class="mobile-menu-btn" id="mobileMenuBtn">
+      <i class="fas fa-bars"></i>
+    </button>
+    
+    <nav id="mainNav">
+      <a href="../index.html" class="nav-home"><i class="fas fa-home"></i> Home</a>
+      <a href="directory.html" class="nav-directory"><i class="fas fa-users"></i> Community</a>
+      <a href="jobs.html" class="nav-jobs"><i class="fas fa-briefcase"></i> Jobs</a>
+      <a href="events.html" class="nav-events"><i class="fas fa-calendar-alt"></i> Events</a>
+      <a href="messages.html" class="nav-messages"><i class="fas fa-comments"></i> Messages</a>
+      <a href="dashboard.html" class="nav-dashboard"><i class="fas fa-chart-bar"></i> Dashboard</a>
+      <span id="authLinks">
+        <a href="login.html" class="btn active"><i class="fas fa-sign-in-alt"></i> Login</a>
+        <a href="register.html" class="btn primary"><i class="fas fa-user-plus"></i> Register</a>
+      </span>
+    </nav>
+  </header>
+  
+  <main class="container">
+    <div class="card" style="max-width:480px;margin:auto">
+      <h3><i class="fas fa-sign-in-alt"></i> Login to AlumniConnect</h3>
+      <p class="small" style="margin-bottom:20px;">Access your alumni network and professional connections</p>
+      <form id="loginForm">
+        <div class="grid">
+          <div style="position:relative">
+            <i class="fas fa-envelope" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-light);"></i>
+            <input id="email" placeholder="Email" required style="padding-left:35px">
+          </div>
+          <div style="position:relative">
+            <i class="fas fa-lock" style="position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--muted-light);"></i>
+            <input id="password" type="password" placeholder="Password" required style="padding-left:35px">
+          </div>
+        </div>
+        <div style="margin-top:10px">
+          <button class="btn primary" type="submit" style="width:100%"><i class="fas fa-sign-in-alt"></i> Login</button>
+          <div style="text-align:center;margin-top:12px;">
+            <a href="register.html" class="btn"><i class="fas fa-user-plus"></i> Create New Account</a>
+          </div>
+        </div>
+      </form>
+      
+      <div class="card" style="margin-top:20px;background:rgba(11,116,255,0.05);">
+        <h4><i class="fas fa-info-circle"></i> Demo Credentials</h4>
+        <p class="small">Try the platform with these demo accounts:</p>
+        <div style="font-size:12px;margin-top:8px;">
+          <div><strong>Admin:</strong> admin@alumni.com / admin123</div>
+          <div><strong>Student:</strong> emily.d@example.com / demo123</div>
+          <div><strong>Alumni:</strong> sarah.j@example.com / demo123</div>
+        </div>
+      </div>
+    </div>
+  </main>
+  
+  <script src="../js/app.js"></script>
+  <script>
+    document.getElementById('loginForm').addEventListener('submit',(e)=>{
+      e.preventDefault();
+      const email = document.getElementById('email').value.trim().toLowerCase();
+      const password = document.getElementById('password').value;
+      
+      if(App.login(email,password)){
+        alert('Login successful! Welcome back.');
+        window.location.href = 'profile.html';
+      } else {
+        alert('Invalid credentials. Please try again or use demo credentials.');
+      }
+    });
+
+    // Mobile menu functionality
+    document.getElementById('mobileMenuBtn')?.addEventListener('click', function() {
+      document.getElementById('mainNav').classList.toggle('show');
+    });
+
+    // Update auth links based on login status
+    function updateAuthLinks() {
+      const current = App.currentUser();
+      const authLinks = document.getElementById('authLinks');
+      
+      if (authLinks && current) {
+        authLinks.innerHTML = `
+          <a href="profile.html" class="btn"><i class="fas fa-user"></i> Profile</a>
+          <a href="#" class="btn primary" id="logoutBtn"><i class="fas fa-sign-out-alt"></i> Logout</a>
+        `;
+        document.getElementById('logoutBtn')?.addEventListener('click', (e) => {
+          e.preventDefault();
+          App.logout();
+          window.location.href = 'login.html';
+        });
+      }
+    }
+
+    updateAuthLinks();
+
+    // Close mobile menu when clicking outside
+    document.addEventListener('click', function(e) {
+      const nav = document.getElementById('mainNav');
+      const menuBtn = document.getElementById('mobileMenuBtn');
+      
+      if (nav && menuBtn && !nav.contains(e.target) && !menuBtn.contains(e.target)) {
+        nav.classList.remove('show');
+      }
+    });
+  </script>
+</body>
+</html>
